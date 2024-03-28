@@ -13,6 +13,10 @@
   src: url("../fonts/sfpro/SFProText-Medium.ttf");
 }
 
+button {
+  border: 0;
+}
+
 .container {
   position: relative;
   height: 100vh;
@@ -35,6 +39,35 @@ header {
 
 .score {
   gap: 12px;
+}
+
+.right {
+  position: relative;
+}
+
+.copy-btn {
+  background: transparent;
+}
+
+.copy {
+  position: absolute;
+  width: 200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 9px;
+
+  left: -170px;
+  top: 40px;
+
+  background-color: #ffffff;
+  color: #151a30;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.hidden {
+  display: none;
 }
 
 .points {
