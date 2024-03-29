@@ -1,48 +1,52 @@
+// DOM Elements
 let ammoElement = document.getElementById("ammo");
 let pointsElement = document.getElementById("points");
 let gameField = document.getElementById("background");
 let copyBtn = document.getElementById("copy");
 let catapult = document.getElementById("catapult");
 
+// Initializations
 let ammo = parseInt(localStorage.getItem("ammo")) || 0;
 let points = parseInt(localStorage.getItem("points")) || 0;
 let lastAmmoUpdate =
   parseInt(localStorage.getItem("lastAmmoUpdate")) || Date.now();
-let max_ammo = 5000;
+let maxAmmo = 5000;
+let currentTime;
+let isAnimating = false;
 
-currentTime = Date.now();
-ammo = 0;
-ammoElement.textContent = `+${ammo}`;
-localStorage.setItem("ammo", ammo);
-localStorage.setItem("lastAmmoUpdate", currentTime);
+// Constants
+const pointsPerTap = 5;
+const ammoPoints = 5;
+const animationDuration = 400;
 
-let points_per_tap = 5;
-let ammo_points = 5;
-
-console.log(ammo, points, lastAmmoUpdate);
-
-pointsElement.textContent = points;
-ammoElement.textContent = `+${ammo}`;
-
+// Event Handlers
 function updatePoints() {
-  if (ammo - ammo_points < 0) return;
-  ammo -= ammo_points;
+  if (isAnimating || ammo - ammoPoints < 0) return;
+  isAnimating = true;
+
+  ammo -= ammoPoints;
   ammoElement.textContent = `+${ammo}`;
-  points += points_per_tap;
+
+  points += pointsPerTap;
   pointsElement.textContent = points;
+
   catapultAnimate();
 
-  localStorage.setItem("ammo", ammo);
-  localStorage.setItem("points", points);
-  localStorage.setItem("lastAmmoUpdate", Date.now());
+  saveGameData();
+
+  setTimeout(() => {
+    isAnimating = false;
+  }, animationDuration);
 }
 
 function updateAmmo() {
-  ammo += ammo_points;
+  ammo += ammoPoints;
+  if (ammo > maxAmmo) {
+    ammo = maxAmmo;
+  }
   ammoElement.textContent = `+${ammo}`;
 
-  localStorage.setItem("ammo", ammo);
-  localStorage.setItem("lastAmmoUpdate", Date.now());
+  saveGameData();
 }
 
 function toggleCopyBlock() {
@@ -50,30 +54,47 @@ function toggleCopyBlock() {
 }
 
 function copyText() {
-  navigator.clipboard.writeText("https://youtube.com");
-  copyBtn.classList.toggle("hidden");
+  navigator.clipboard
+    .writeText("https://youtube.com")
+    .then(() => {
+      toggleCopyBlock();
+    })
+    .catch((error) => {
+      console.error("Error copying text: ", error);
+    });
 }
 
+// Utility Functions
 function initialAmmoUpdate() {
-  let currentTime = Date.now();
+  currentTime = Date.now();
   let timeDifference = currentTime - lastAmmoUpdate;
 
   let ammoIncrement = Math.floor(timeDifference / 1000);
-  if (ammo + ammoIncrement <= max_ammo) ammo += ammoIncrement * ammo_points;
-  else ammo = max_ammo;
+  if (ammo + ammoIncrement <= maxAmmo) {
+    ammo += ammoIncrement * ammoPoints;
+  } else {
+    ammo = maxAmmo;
+  }
   ammoElement.textContent = `+${ammo}`;
-  localStorage.setItem("ammo", ammo);
-  localStorage.setItem("lastAmmoUpdate", currentTime);
+  pointsElement.textContent = points;
+  saveGameData(currentTime);
 }
 
 function catapultAnimate() {
   catapult.classList.add("active");
-  setTimeout(function () {
+  setTimeout(() => {
     catapult.classList.remove("active");
-  }, 400);
+  }, animationDuration);
 }
 
-initialAmmoUpdate();
+function saveGameData(currentTime = Date.now()) {
+  localStorage.setItem("ammo", ammo);
+  localStorage.setItem("points", points);
+  localStorage.setItem("lastAmmoUpdate", currentTime);
+}
 
+// Initialization
+console.log(ammo, points);
+initialAmmoUpdate();
 setInterval(updateAmmo, 1000);
 gameField.addEventListener("click", updatePoints);
