@@ -101,6 +101,29 @@ main {
   z-index: 2;
 }
 
+.catapult-animation {
+  position: absolute;
+  top: 87px;
+  left: 67px;
+  background: url("../assets/main-page/DS.png") left top;
+  height: 72px;
+  width: 80px;
+}
+
+.catapult-animation.active {
+  animation: run 0.4s steps(8);
+}
+
+@keyframes run {
+  0% {
+    background-position: 0;
+  }
+
+  100% {
+    background-position: -576px;
+  }
+}
+
 .perks-section {
   position: absolute;
   bottom: 15%;
